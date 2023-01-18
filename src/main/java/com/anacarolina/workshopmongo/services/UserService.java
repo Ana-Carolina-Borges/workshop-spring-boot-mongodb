@@ -1,7 +1,9 @@
 package com.anacarolina.workshopmongo.services;
 
 import com.anacarolina.workshopmongo.domain.User;
+import com.anacarolina.workshopmongo.dto.UserDTO;
 import com.anacarolina.workshopmongo.repository.UserRepository;
+import com.anacarolina.workshopmongo.services.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,11 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -21,8 +25,15 @@ public class UserService {
 
     public User findById(String id) {
         Optional<User> obj = userRepository.findById(id);
-        return obj.orElseThrow(() -> new RuntimeException("Objeto não encontrado"));
+        return obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado"));
+    }
 
+    public User insert(User obj) {
+        return userRepository.insert(obj);
+    }
+
+    public User fromDTO(UserDTO objDto) {
+        return new User(objDto.getId(), objDto.getName(), objDto.getEmail());
     }
 
 
