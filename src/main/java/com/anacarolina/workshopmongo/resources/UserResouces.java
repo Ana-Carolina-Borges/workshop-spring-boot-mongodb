@@ -1,5 +1,6 @@
 package com.anacarolina.workshopmongo.resources;
 
+import com.anacarolina.workshopmongo.domain.Post;
 import com.anacarolina.workshopmongo.domain.User;
 import com.anacarolina.workshopmongo.dto.UserDTO;
 import com.anacarolina.workshopmongo.services.UserService;
@@ -24,18 +25,18 @@ public class UserResouces {
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
         List<User> list = service.findAll();
-       List<UserDTO> listDto = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
+        List<UserDTO> listDto = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
         return ResponseEntity.ok().body(listDto);
     }
 
-    @GetMapping(value="/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable String id) {
         User obj = service.findById(id);
         return ResponseEntity.ok().body(new UserDTO(obj));
     }
 
     @PostMapping
-    public ResponseEntity<Void> insert(@RequestBody UserDTO userDto){
+    public ResponseEntity<Void> insert(@RequestBody UserDTO userDto) {
         User obj = service.fromDTO(userDto);
         obj = service.insert(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
@@ -43,20 +44,25 @@ public class UserResouces {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id){
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
 
     }
 
-   @PutMapping(value = "/{id}")
-    public ResponseEntity<Void> update (@RequestBody UserDTO objDto, @PathVariable String id ){
-       User obj = service.fromDTO(objDto);
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Void> update(@RequestBody UserDTO objDto, @PathVariable String id) {
+        User obj = service.fromDTO(objDto);
         obj.setId(id);
-        obj= service.update(obj);
+        obj = service.update(obj);
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping(value = "/{id}/posts")
+    public ResponseEntity<List<Post>> findPosts(@PathVariable String id) {
+        User obj = service.findById(id);
+        return ResponseEntity.ok().body(obj.getPosts());
+    }
 
 
 }
